@@ -10,6 +10,13 @@ test: test.o
 
 test.o: test.cpp
 	g++ $(FLAGS) -c test.cpp
+
+main: main.o
+	g++ $(FLAGS) main.o -o main
+
+main.o: main.cpp
+	g++ $(FLAGS) -c main.cpp
+
 tar: clean
 	cd .. && tar -cvzf CS440_$(LASTNAME)_$(BU_USERID).tar.gz
 

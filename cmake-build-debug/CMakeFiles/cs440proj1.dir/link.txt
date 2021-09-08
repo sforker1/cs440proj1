@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/cs440proj1.dir/main.cpp.o  -o cs440proj1 
