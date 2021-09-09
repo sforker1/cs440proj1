@@ -23,10 +23,12 @@ int main() {
 	printf("---- %s, %d\n", deq.type_name, int(sizeof(deq.type_name)));
 	// std::cout << "---- " << deq.type_name << ", " << sizeof(deq.type_name) << std::endl;
 	assert(sizeof deq.type_name == 10);
-	/*
+
 	deq.push_back(&deq, 1);
 	deq.push_back(&deq, 2);
 	deq.push_back(&deq, 3);
+	deq.print(&deq);
+	/*
 	deq.push_front(&deq, 0);
 	deq.push_front(&deq, -1);
 
