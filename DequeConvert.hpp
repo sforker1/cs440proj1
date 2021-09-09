@@ -8,7 +8,7 @@
 
 
 struct Deque_int {
-	std::string type_name = "Deque_int";
+	char type_name[sizeof("Deque_int")] = "Deque_int";
 	int *array;
 	size_t sizeVar;
 //	int (*begin)(const struct Deque_int*);
@@ -54,8 +54,7 @@ void push_back(Deque_int *ap, int b){
 }
 
 Deque_int *Deque_int_ctor(Deque_int *ap, bool notSure) {
-	ap->type_name = "int";
-	ap->array = (int *) malloc(0 * sizeof(int));
+	ap->array = (int *) malloc(1 * sizeof(int));
 	ap->sizeVar = 0;
 	ap->size = &size_func;
 	ap->empty = &empty_func;
