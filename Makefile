@@ -11,7 +11,7 @@ test: test.o
 test.o: test.cpp
 	g++ $(FLAGS) -c test.cpp
 
-main: main.o
+main: clean main.o
 	g++ $(FLAGS) main.o -o main
 
 main.o: main.cpp
@@ -30,4 +30,4 @@ memcheck: $(EXECUTABLE)
 	valgrind ./$(EXECUTABLE)
 
 clean:
-	rm -f *.o $(EXECUTABLE)
+	rm -f *.o $(EXECUTABLE) main
