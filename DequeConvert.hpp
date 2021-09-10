@@ -5,10 +5,15 @@
 #include <cstddef>
 #include <cstdlib>
 
+
 struct Deque_int_Iterator {
 	int *varPointer;
+	int iterFront;
+	int iterBack;
+	int iterSize;
+	int *startArray;
 	int (*deref)(const struct Deque_int_Iterator*);
-	void (*inc)(const struct Deque_int_Iterator*);
+	void (*inc)(Deque_int_Iterator*);
 };
 
 struct Deque_int {
@@ -19,7 +24,7 @@ struct Deque_int {
 	int backVar = -1;
 	size_t sizeVar; //amount of elements in the array
 	Deque_int_Iterator (*begin)(const struct Deque_int*);
-	int* (*end)(const struct Deque_int*);
+	Deque_int_Iterator (*end)(const struct Deque_int*);
 	size_t (*size)(const struct Deque_int*);
 	bool (*empty)(const struct Deque_int*);
 	void (*print)(const struct Deque_int*);
@@ -32,9 +37,41 @@ struct Deque_int {
 };
 
 
+void inc_func(Deque_int_Iterator* ap) {
+	if(ap->iterFront == ap->iterBack) {
+		//std::cout << "Inc Case 1" << std::endl;
+		ap->iterFront++;
+		ap->varPointer++;
+		// do nothing? undefined behavior because we're hoping the iterator catches the next dereference from the pointer
+	} else if (ap->iterFront < ap->iterBack){
+		//std::cout << "Inc Case 2" << std::endl;
+		ap->iterFront++;
+		ap->varPointer++;
+	} else {
+		if(ap->varPointer == (ap->startArray + (ap->iterSize - 1))) {
+			//std::cout << "Inc Case 3" << std::endl;
+			ap->iterFront = 0;
+			ap->varPointer = ap->startArray;
+		} else {
+			//std::cout << "Inc Case 4" << std::endl;
+			ap->iterFront++;
+			ap->varPointer++;
+		}
+	}
+}
 
-bool Deque_int_Iterator_equal(Deque_int_Iterator ap, int *end) {
-	return false;
+int deref_func(const struct Deque_int_Iterator* ap) {
+	return *(ap->varPointer);
+}
+
+
+bool Deque_int_Iterator_equal(Deque_int_Iterator ap, Deque_int_Iterator ap2) {
+	//std::cout << "COMPARE: " << ap.varPointer << " and " << ap2.varPointer << std::endl;
+	if(ap.varPointer == ap2.varPointer) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 //void Deque_delete(int *ap) {
@@ -44,11 +81,27 @@ bool Deque_int_Iterator_equal(Deque_int_Iterator ap, int *end) {
 Deque_int_Iterator begin_func(const struct Deque_int* ap) {
 	Deque_int_Iterator retVal;
 	retVal.varPointer = &ap->array[ap->frontVar];
+	retVal.inc = &inc_func;
+	retVal.deref = &deref_func;
+	retVal.iterFront = ap->frontVar;
+	retVal.iterBack = ap->backVar;
+	retVal.iterSize = ap->arrSize;
+	retVal.startArray = ap->array;
 	return retVal;
 }
 
-int *end_func(const struct Deque_int* ap) {
-	return &ap->array[ap->backVar];
+Deque_int_Iterator end_func(const struct Deque_int* ap) {
+	Deque_int_Iterator retVal;
+	int *tempPointer = &ap->array[ap->backVar];
+	tempPointer++;
+	retVal.varPointer = tempPointer;
+	retVal.inc = &inc_func;
+	retVal.deref = &deref_func;
+	retVal.iterFront = ap->frontVar;
+	retVal.iterBack = ap->backVar;
+	retVal.iterSize = ap->arrSize;
+	retVal.startArray = ap->array;
+	return retVal;
 }
 
 void pop_front_func(Deque_int* ap) {

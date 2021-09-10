@@ -41,10 +41,7 @@ int main() {
 	assert(deq.front(&deq) == 0);
 	assert(deq.back(&deq) == 2);
 
-	printf("%d\n", deq.front(&deq));
-	printf("%d\n", deq.back(&deq));
-
-	deq.print(&deq);
+	//deq.print(&deq);
 	assert(deq.size(&deq) == 3);
 
 	for (Deque_int_Iterator it = deq.begin(&deq);
