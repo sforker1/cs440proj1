@@ -27,11 +27,10 @@ int main() {
 	deq.push_back(&deq, 1);
 	deq.push_back(&deq, 2);
 	deq.push_back(&deq, 3);
-	deq.print(&deq);
-	/*
 	deq.push_front(&deq, 0);
 	deq.push_front(&deq, -1);
-
+	deq.print(&deq);
+	/*
 	printf("%d\n", deq.front(&deq));
 	printf("%d\n", deq.back(&deq));
 	assert(deq.front(&deq) == -1);
