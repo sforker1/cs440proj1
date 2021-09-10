@@ -40,6 +40,20 @@ struct Deque_int {
 	void (*push_front)(Deque_int*, int);
 };
 
+bool Deque_int_equal(const struct Deque_int ap, const struct Deque_int ap2) {
+	if(ap.sizeVar == ap2.sizeVar) {
+		for(long unsigned int i = 0; i < ap.sizeVar; i++) {
+			//std::cout << "COMPARE: " << ap.at(&ap, i) << " vs " << ap2.at(&ap2, i) << std::endl;
+			if(ap.at(&ap, i) != ap2.at(&ap2, i)) {
+				return false;
+			}
+		}
+	} else {
+		return false;
+	}
+	return true;
+}
+
 void clear_func(Deque_int* ap) {
 	ap->frontVar = -1;
 	ap->backVar = -1;
@@ -293,7 +307,7 @@ void push_back_func(Deque_int *ap, int newInt){ //add param for front or back
 		ap->backVar = 0;
 		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
-		std::cout << "Case Back 0: " << newInt << " inserted at " << ap->backVar << std::endl;
+		//std::cout << "Case Back 0: " << newInt << " inserted at " << ap->backVar << std::endl;
 		return;
 	}
 	int ifSpace = check_array_space(ap);
@@ -301,19 +315,19 @@ void push_back_func(Deque_int *ap, int newInt){ //add param for front or back
 		ap->backVar++; //check
 		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
-		std::cout << "Case Back 1: " << newInt << " inserted at " << ap->backVar << std::endl;
+		//std::cout << "Case Back 1: " << newInt << " inserted at " << ap->backVar << std::endl;
 	} else if (ifSpace == 1) { //Needs shift
 		resize_array(ap, true);
 		ap->backVar++;
 		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
-		std::cout << "Case Back 2: " << newInt << " inserted at " << ap->backVar << std::endl;
+		//std::cout << "Case Back 2: " << newInt << " inserted at " << ap->backVar << std::endl;
 	} else { //No shift
 		resize_array(ap, false);
 		ap->backVar++;
 		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
-		std::cout << "Case Back 3: " << newInt << " inserted at " << ap->backVar << std::endl;
+		//std::cout << "Case Back 3: " << newInt << " inserted at " << ap->backVar << std::endl;
 	}
 }
 
