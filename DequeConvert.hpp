@@ -5,7 +5,11 @@
 #include <cstddef>
 #include <cstdlib>
 
-
+struct Deque_int_Iterator {
+	int *varPointer;
+	int (*deref)(const struct Deque_int_Iterator*);
+	void (*inc)(const struct Deque_int_Iterator*);
+};
 
 struct Deque_int {
 	char type_name[sizeof("Deque_int")] = "Deque_int";
@@ -14,31 +18,102 @@ struct Deque_int {
 	int frontVar = -1;
 	int backVar = -1;
 	size_t sizeVar; //amount of elements in the array
-//	int (*begin)(const struct Deque_int*);
-//	int (*end)(const struct Deque_int*);
+	Deque_int_Iterator (*begin)(const struct Deque_int*);
+	int* (*end)(const struct Deque_int*);
 	size_t (*size)(const struct Deque_int*);
 	bool (*empty)(const struct Deque_int*);
 	void (*print)(const struct Deque_int*);
-//	int (*front)(const struct Deque_int*);
-//	int (*back)(const struct Deque_int*);
-//	int (*pop_front)(const struct Deque_int*);
-//	int (*pop_back)(const struct Deque_int*);
+	int (*front)(const struct Deque_int*);
+	int (*back)(const struct Deque_int*);
+	void (*pop_front)(Deque_int*);
+	void (*pop_back)(Deque_int*);
 	void (*push_back)(Deque_int*, int);
 	void (*push_front)(Deque_int*, int);
 };
 
-struct Deque_int_Iterator {
-	int (*deref)(const struct Deque_int_Iterator*);
-	void (*inc)(const struct Deque_int_Iterator*);
-};
 
-//bool Deque_int_Iterator_equal(Deque_int_Iterator* ap, int end) {
-//	return false;
-//}
+
+bool Deque_int_Iterator_equal(Deque_int_Iterator ap, int *end) {
+	return false;
+}
 
 //void Deque_delete(int *ap) {
 //	free(ap);
 //}
+
+Deque_int_Iterator begin_func(const struct Deque_int* ap) {
+	Deque_int_Iterator retVal;
+	retVal.varPointer = &ap->array[ap->frontVar];
+	return retVal;
+}
+
+int *end_func(const struct Deque_int* ap) {
+	return &ap->array[ap->backVar];
+}
+
+void pop_front_func(Deque_int* ap) {
+	if(ap->frontVar == (ap->arrSize - 1)) {
+		ap->frontVar = 0;
+		ap->sizeVar--;
+	} else if (ap->frontVar == 0 && ap->backVar == 0){
+		ap->frontVar = -1;
+		ap->backVar = -1;
+		ap->sizeVar--;
+	} else if (ap->frontVar == ap->backVar) {
+		ap->sizeVar--;
+		//remove item by placing fake place holder?
+		//reduce size
+		//increase height on if tree (top)
+	} else if (ap->frontVar < ap->backVar){
+		if(ap->frontVar == 0) {
+			ap->sizeVar--;
+			ap->frontVar = (ap->arrSize - 1);
+		} else {
+			ap->sizeVar--;
+			ap->frontVar--;
+		}
+	} else {
+		if(ap->frontVar == (ap->arrSize - 1)){
+			ap->sizeVar--;
+			ap->frontVar = 0;
+		} else {
+			ap->sizeVar--;
+			ap->frontVar++;
+		}
+	}
+}
+
+void pop_back_func(Deque_int* ap) {
+	if(ap->backVar == 0 && ap->frontVar == 0){
+		ap->backVar = -1;
+		ap->frontVar = -1;
+		ap->sizeVar--;
+	} else if (ap->backVar == ap->frontVar) {
+		ap->sizeVar--;
+		//nothing happens
+		//fake variable
+	} else if (ap->backVar < ap->frontVar) {
+		if(ap->backVar == 0) {
+			ap->sizeVar--;
+			ap->backVar = (ap->arrSize - 1);
+		} else {
+			ap->sizeVar--;
+			ap->backVar--;
+		}
+	} else {
+		ap->sizeVar--;
+		ap->backVar--;
+	}
+}
+
+int front_func(const struct Deque_int* ap) {
+	return ap->array[ap->frontVar];
+}
+
+int back_func(const struct Deque_int* ap) {
+	return ap->array[ap->backVar];
+}
+
 
 size_t size_func(const struct Deque_int* ap) {
 	return ap->sizeVar;
@@ -85,6 +160,7 @@ void push_front_func(Deque_int *ap, int newInt){
 	if(ap->frontVar == -1) {
 		ap->frontVar = 0;
 		ap->backVar = 0;
+		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
 		std::cout << "Case Front 0: " << newInt << " inserted at " << ap->frontVar << std::endl;
 		return;
@@ -96,6 +172,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		} else {
 			ap->frontVar--;
 		}
+		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
 		std::cout << "Case Front 1: " << newInt << " inserted at " << ap->frontVar << std::endl;
 	} else if (ifSpace == 1) {
@@ -105,6 +182,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		} else {
 			ap->frontVar--;
 		}
+		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
 		std::cout << "Case Front 2: " << newInt << " inserted at " << ap->frontVar << std::endl;
 	} else {
@@ -114,6 +192,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		} else {
 			ap->frontVar--;
 		}
+		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
 		std::cout << "Case Front 3: " << newInt << " inserted at " << ap->frontVar << std::endl;
 	}
@@ -123,6 +202,7 @@ void push_back_func(Deque_int *ap, int newInt){ //add param for front or back
 	if(ap->backVar == -1) {
 		ap->frontVar = 0;
 		ap->backVar = 0;
+		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
 		std::cout << "Case Back 0: " << newInt << " inserted at " << ap->backVar << std::endl;
 		return;
@@ -130,16 +210,19 @@ void push_back_func(Deque_int *ap, int newInt){ //add param for front or back
 	int ifSpace = check_array_space(ap);
 	if(ifSpace == 0) {
 		ap->backVar++; //check
+		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
 		std::cout << "Case Back 1: " << newInt << " inserted at " << ap->backVar << std::endl;
 	} else if (ifSpace == 1) { //Needs shift
 		resize_array(ap, true);
 		ap->backVar++;
+		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
 		std::cout << "Case Back 2: " << newInt << " inserted at " << ap->backVar << std::endl;
 	} else { //No shift
 		resize_array(ap, false);
 		ap->backVar++;
+		ap->sizeVar++;
 		ap->array[ap->backVar] = newInt;
 		std::cout << "Case Back 3: " << newInt << " inserted at " << ap->backVar << std::endl;
 	}
@@ -169,6 +252,7 @@ void print_func(const struct Deque_int* ap) {
 	std::cout << "}" << std::endl;
 	std::cout << "Front: " << ap->frontVar << std::endl;
 	std::cout << "Back: " << ap->backVar << std::endl;
+	std::cout << "True Size: " << ap->sizeVar << std::endl;
 }
 
 void Deque_int_ctor(Deque_int *ap, bool notSure) {
@@ -184,6 +268,12 @@ void Deque_int_ctor(Deque_int *ap, bool notSure) {
 	ap->push_back = &push_back_func;
 	ap->push_front = &push_front_func;
 	ap->print = &print_func;
+	ap->front = &front_func;
+	ap->back = &back_func;
+	ap->pop_front = &pop_front_func;
+	ap->pop_back = &pop_back_func;
+	ap->begin = &begin_func;
+	ap->end = &end_func;
 }
 
 

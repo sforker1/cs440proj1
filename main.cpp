@@ -29,8 +29,8 @@ int main() {
 	deq.push_back(&deq, 3);
 	deq.push_front(&deq, 0);
 	deq.push_front(&deq, -1);
-	deq.print(&deq);
-	/*
+
+
 	printf("%d\n", deq.front(&deq));
 	printf("%d\n", deq.back(&deq));
 	assert(deq.front(&deq) == -1);
@@ -41,10 +41,14 @@ int main() {
 	assert(deq.front(&deq) == 0);
 	assert(deq.back(&deq) == 2);
 
-	assert(deq.size(&deq) == 3); */
+	printf("%d\n", deq.front(&deq));
+	printf("%d\n", deq.back(&deq));
 
-//	for (Deque_int_Iterator it = deq.begin(&deq);
-//	     !Deque_int_Iterator_equal(it, deq.end(&deq)); it.inc(&it)) {
-//		printf("%d\n", it.deref(&it));
-//	}
+	deq.print(&deq);
+	assert(deq.size(&deq) == 3);
+
+	for (Deque_int_Iterator it = deq.begin(&deq);
+	     !Deque_int_Iterator_equal(it, deq.end(&deq)); it.inc(&it)) {
+		printf("%d\n", it.deref(&it));
+	}
 }
