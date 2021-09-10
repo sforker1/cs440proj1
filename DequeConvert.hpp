@@ -14,6 +14,7 @@ struct Deque_int_Iterator {
 	int *startArray;
 	int (*deref)(const struct Deque_int_Iterator*);
 	void (*inc)(Deque_int_Iterator*);
+	void (*dec)(Deque_int_Iterator*);
 };
 
 struct Deque_int {
@@ -30,12 +31,49 @@ struct Deque_int {
 	void (*print)(const struct Deque_int*);
 	int (*front)(const struct Deque_int*);
 	int (*back)(const struct Deque_int*);
+	int (*at)(const struct Deque_int*, int);
 	void (*pop_front)(Deque_int*);
 	void (*pop_back)(Deque_int*);
+	void (*clear)(Deque_int*);
+	void (*dtor)(Deque_int*);
 	void (*push_back)(Deque_int*, int);
 	void (*push_front)(Deque_int*, int);
 };
 
+void clear_func(Deque_int* ap) {
+	ap->frontVar = -1;
+	ap->backVar = -1;
+}
+
+void dtor_func(Deque_int* ap) {
+	// save for later
+}
+
+int at_func(const struct Deque_int* ap, int num) {
+	int index = ap->frontVar + num;
+	if(index > (ap->arrSize - 1)) { //exceeds array size
+		index = index - ap->arrSize;
+	}
+	return ap->array[index];
+}
+
+void dec_func(Deque_int_Iterator* ap) {
+	if(ap->iterBack == ap->iterFront) {
+		ap->iterBack--;
+		ap->varPointer--;
+	} else if (ap->iterBack > ap->iterFront) {
+		ap->iterBack--;
+		ap->varPointer--;
+	} else {
+		if(ap->iterBack == 0) {
+			ap->varPointer = (ap->startArray + (ap->iterSize - 1));
+			ap->iterBack = (ap->iterSize - 1);
+		} else {
+			ap->iterBack--;
+			ap->varPointer--;
+		}
+	}
+}
 
 void inc_func(Deque_int_Iterator* ap) {
 	if(ap->iterFront == ap->iterBack) {
@@ -48,7 +86,7 @@ void inc_func(Deque_int_Iterator* ap) {
 		ap->iterFront++;
 		ap->varPointer++;
 	} else {
-		if(ap->varPointer == (ap->startArray + (ap->iterSize - 1))) {
+		if(ap->varPointer == (ap->startArray + (ap->iterSize - 1))) { //couldnt i just switch to (if ap->iterFront == ap->iterSize - 1)
 			//std::cout << "Inc Case 3" << std::endl;
 			ap->iterFront = 0;
 			ap->varPointer = ap->startArray;
@@ -74,15 +112,12 @@ bool Deque_int_Iterator_equal(Deque_int_Iterator ap, Deque_int_Iterator ap2) {
 	}
 }
 
-//void Deque_delete(int *ap) {
-//	free(ap);
-//}
-
 Deque_int_Iterator begin_func(const struct Deque_int* ap) {
 	Deque_int_Iterator retVal;
 	retVal.varPointer = &ap->array[ap->frontVar];
 	retVal.inc = &inc_func;
 	retVal.deref = &deref_func;
+	retVal.dec = &dec_func;
 	retVal.iterFront = ap->frontVar;
 	retVal.iterBack = ap->backVar;
 	retVal.iterSize = ap->arrSize;
@@ -97,6 +132,7 @@ Deque_int_Iterator end_func(const struct Deque_int* ap) {
 	retVal.varPointer = tempPointer;
 	retVal.inc = &inc_func;
 	retVal.deref = &deref_func;
+	retVal.dec = &dec_func;
 	retVal.iterFront = ap->frontVar;
 	retVal.iterBack = ap->backVar;
 	retVal.iterSize = ap->arrSize;
@@ -215,7 +251,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		ap->backVar = 0;
 		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
-		std::cout << "Case Front 0: " << newInt << " inserted at " << ap->frontVar << std::endl;
+		//std::cout << "Case Front 0: " << newInt << " inserted at " << ap->frontVar << std::endl;
 		return;
 	}
 	int ifSpace = check_array_space(ap);
@@ -227,7 +263,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		}
 		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
-		std::cout << "Case Front 1: " << newInt << " inserted at " << ap->frontVar << std::endl;
+		//std::cout << "Case Front 1: " << newInt << " inserted at " << ap->frontVar << std::endl;
 	} else if (ifSpace == 1) {
 		resize_array(ap, true);
 		if(ap->frontVar == 0) {
@@ -237,7 +273,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		}
 		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
-		std::cout << "Case Front 2: " << newInt << " inserted at " << ap->frontVar << std::endl;
+		//std::cout << "Case Front 2: " << newInt << " inserted at " << ap->frontVar << std::endl;
 	} else {
 		resize_array(ap, false);
 		if(ap->frontVar == 0) {
@@ -247,7 +283,7 @@ void push_front_func(Deque_int *ap, int newInt){
 		}
 		ap->sizeVar++;
 		ap->array[ap->frontVar] = newInt;
-		std::cout << "Case Front 3: " << newInt << " inserted at " << ap->frontVar << std::endl;
+		//std::cout << "Case Front 3: " << newInt << " inserted at " << ap->frontVar << std::endl;
 	}
 }
 
@@ -327,6 +363,9 @@ void Deque_int_ctor(Deque_int *ap, bool notSure) {
 	ap->pop_back = &pop_back_func;
 	ap->begin = &begin_func;
 	ap->end = &end_func;
+	ap->at = &at_func;
+	ap->dtor = dtor_func;
+	ap->clear = &clear_func;
 }
 
 
