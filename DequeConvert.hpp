@@ -9,8 +9,6 @@
 struct Deque_int_Iterator {
 	int *varPointer;
 	int iterCurr;
-	int iterFront;
-	int iterBack;
 	int iterSize;
 	int *startArray;
 	int (*deref)(const struct Deque_int_Iterator*);
@@ -42,50 +40,48 @@ struct Deque_int {
 	void (*sort)(Deque_int*, Deque_int_Iterator, Deque_int_Iterator);
 };
 
-void mergeSortMerger(Deque_int* ap, int low, int high, int mid) {
-	int sz = high - low + 1;
-	int *tmpArray = new int[sz];
-	int i = low, j = mid + 1, k = 0;
-	while ((i <= mid) && (j <= high)) {
+void mergeSortMerger(Deque_int* ap, int lower, int higher, int middle) {
+	int size = higher - lower + 1;
+	int *tmpArray = new int[size];
+	int i = lower;
+	int j = middle + 1;
+	int k = 0;
+	while ((i <= middle) && (j <= higher)) {
 		if (ap->array[i] < ap->array[j])
 			tmpArray[k++] = ap->array[i++];
 		else
 			tmpArray[k++] = ap->array[j++];
 	}
-	while (i <= mid) {
+	while (i <= middle) {
 		tmpArray[k++] = ap->array[i++];
 	}
-	while (j <= high) {
+	while (j <= higher) {
 		tmpArray[k++] = ap->array[j++];
 	}
-	for (k = 0; k < sz; k++) {
-		ap->array[low + k] = tmpArray[k];
+	for (k = 0; k < size; k++) {
+		ap->array[lower + k] = tmpArray[k];
 	}
 	delete [] tmpArray;
 }
 
-void mergeSort(Deque_int* ap, int low, int high) {
-	unsigned int spot;
-	if (low < high) {
-		spot = (low + high) / 2;
-		mergeSort(ap, low, spot);
-		mergeSort(ap, spot + 1, high);
-		mergeSortMerger(ap, low, high, spot);
+void mergeSort(Deque_int* ap, int lower, int higher) {
+	unsigned int middle;
+	if (lower < higher) {
+		middle = (lower + higher) / 2;
+		mergeSort(ap, lower, middle);
+		mergeSort(ap, middle + 1, higher);
+		mergeSortMerger(ap, lower, higher, middle);
 	}
 }
 
 void sort_func(Deque_int* ap, Deque_int_Iterator low, Deque_int_Iterator high) {
-	if(high.iterBack < low.iterFront) {
+	if(high.iterCurr < low.iterCurr) {
 		std::cout << "YIKES ALERT!" << std::endl;
 		//fix array fix_array(Deque_int* ap);
-	} else if (low.iterFront == high.iterBack) {
+	} else if (low.iterCurr == high.iterCurr) {
 		return; // do nothing!
 	}
-	//int tempFront = low.iterFront;
-	//int tempBack = high.iterBack;
-	mergeSort(ap, low.iterFront, high.iterBack);
-	//ap->frontVar = tempFront;
-	//ap->backVar = tempBack;
+	mergeSort(ap, low.iterCurr, high.iterCurr);
 }
 
 
@@ -121,43 +117,22 @@ int at_func(const struct Deque_int* ap, int num) {
 }
 
 void dec_func(Deque_int_Iterator* ap) {
-	if(ap->iterBack == ap->iterFront) {
-		ap->iterBack--;
-		ap->varPointer--;
-	} else if (ap->iterBack > ap->iterFront) {
-		ap->iterBack--;
-		ap->varPointer--;
+	if (ap->iterCurr == 0) {
+		ap->iterCurr = (ap->iterSize - 1);
+		ap->varPointer = (ap->startArray + (ap->iterSize - 1));
 	} else {
-		if(ap->iterBack == 0) {
-			ap->varPointer = (ap->startArray + (ap->iterSize - 1));
-			ap->iterBack = (ap->iterSize - 1);
-		} else {
-			ap->iterBack--;
-			ap->varPointer--;
-		}
+		ap->iterCurr--;
+		ap->varPointer--;
 	}
 }
 
 void inc_func(Deque_int_Iterator* ap) {
-	if(ap->iterFront == ap->iterBack) {
-		//std::cout << "Inc Case 1" << std::endl;
-		ap->iterFront++;
-		ap->varPointer++;
-		// do nothing? undefined behavior because we're hoping the iterator catches the next dereference from the pointer
-	} else if (ap->iterFront < ap->iterBack){
-		//std::cout << "Inc Case 2" << std::endl;
-		ap->iterFront++;
-		ap->varPointer++;
+	if (ap->iterCurr == (ap->iterSize - 1)) {
+		ap->iterCurr = 0;
+		ap->varPointer = ap->startArray;
 	} else {
-		if(ap->varPointer == (ap->startArray + (ap->iterSize - 1))) { //couldnt i just switch to (if ap->iterFront == ap->iterSize - 1)
-			//std::cout << "Inc Case 3" << std::endl;
-			ap->iterFront = 0;
-			ap->varPointer = ap->startArray;
-		} else {
-			//std::cout << "Inc Case 4" << std::endl;
-			ap->iterFront++;
-			ap->varPointer++;
-		}
+		ap->varPointer++;
+		ap->iterCurr++;
 	}
 }
 
@@ -178,11 +153,10 @@ bool Deque_int_Iterator_equal(Deque_int_Iterator ap, Deque_int_Iterator ap2) {
 Deque_int_Iterator begin_func(const struct Deque_int* ap) {
 	Deque_int_Iterator retVal;
 	retVal.varPointer = &ap->array[ap->frontVar];
+	retVal.iterCurr = ap->frontVar;
 	retVal.inc = &inc_func;
 	retVal.deref = &deref_func;
 	retVal.dec = &dec_func;
-	retVal.iterFront = ap->frontVar;
-	retVal.iterBack = ap->backVar;
 	retVal.iterSize = ap->arrSize;
 	retVal.startArray = ap->array;
 	return retVal;
@@ -191,13 +165,12 @@ Deque_int_Iterator begin_func(const struct Deque_int* ap) {
 Deque_int_Iterator end_func(const struct Deque_int* ap) {
 	Deque_int_Iterator retVal;
 	int *tempPointer = &ap->array[ap->backVar];
+	retVal.iterCurr = ap->backVar;
 	tempPointer++;
 	retVal.varPointer = tempPointer;
 	retVal.inc = &inc_func;
 	retVal.deref = &deref_func;
 	retVal.dec = &dec_func;
-	retVal.iterFront = ap->frontVar;
-	retVal.iterBack = ap->backVar;
 	retVal.iterSize = ap->arrSize;
 	retVal.startArray = ap->array;
 	return retVal;
