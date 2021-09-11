@@ -48,7 +48,7 @@ void mergeSortMerger(Deque_int* ap, int lower, int higher, int middle) {
 	int j = middle + 1;
 	int k = 0;
 	while ((i <= middle) && (j <= higher)) {
-		if (ap->array[i] < ap->array[j])
+		if (ap->compare(ap->array[i],ap->array[j]))
 			tmpArray[k++] = ap->array[i++];
 		else
 			tmpArray[k++] = ap->array[j++];
