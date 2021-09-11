@@ -38,6 +38,7 @@ struct Deque_int {
 	void (*push_back)(Deque_int*, int);
 	void (*push_front)(Deque_int*, int);
 	void (*sort)(Deque_int*, Deque_int_Iterator, Deque_int_Iterator);
+	bool (*compare)(const int&, const int&);
 };
 
 void mergeSortMerger(Deque_int* ap, int lower, int higher, int middle) {
@@ -354,7 +355,6 @@ void push_back_func(Deque_int *ap, int newInt){ //add param for front or back
 }
 
 void print_func(const struct Deque_int* ap) {
-	//should be remade to print only from front to back
 	std::cout << "Slots in array: " << ap->arrSize << std::endl;
 	std::cout << "{";
 	int tempI = ap->frontVar;
@@ -370,22 +370,15 @@ void print_func(const struct Deque_int* ap) {
 			tempI = 0;
 		}
 	}
-
-//	for(int i = 0; i <= ap->backVar; i++) {
-//		std::cout << ap->array[i] << ", ";
-//	}
 	std::cout << "}" << std::endl;
 	std::cout << "Front: " << ap->frontVar << std::endl;
 	std::cout << "Back: " << ap->backVar << std::endl;
 	std::cout << "True Size: " << ap->sizeVar << std::endl;
 }
 
-void Deque_int_ctor(Deque_int *ap, bool notSure) {
-	if(notSure){
-		notSure = false; // supress warning
-	}
+void Deque_int_ctor(Deque_int *ap, bool (*compare_func)(const int&, const int&)) {
 	ap->array = (int *) malloc(1 * sizeof(int));
-	//ap->array[0] = NULL;
+	ap->compare = compare_func;
 	ap->arrSize++;
 	ap->sizeVar = 0;
 	ap->size = &size_func;
@@ -404,9 +397,5 @@ void Deque_int_ctor(Deque_int *ap, bool notSure) {
 	ap->clear = &clear_func;
 	ap->sort = &sort_func;
 }
-
-
-
-
 
 #endif
