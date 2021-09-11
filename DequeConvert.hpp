@@ -8,6 +8,7 @@
 
 struct Deque_int_Iterator {
 	int *varPointer;
+	int iterCurr;
 	int iterFront;
 	int iterBack;
 	int iterSize;
@@ -38,7 +39,55 @@ struct Deque_int {
 	void (*dtor)(Deque_int*);
 	void (*push_back)(Deque_int*, int);
 	void (*push_front)(Deque_int*, int);
+	void (*sort)(Deque_int*, Deque_int_Iterator, Deque_int_Iterator);
 };
+
+void mergeSortMerger(Deque_int* ap, int low, int high, int mid) {
+	int sz = high - low + 1;
+	int *tmpArray = new int[sz];
+	int i = low, j = mid + 1, k = 0;
+	while ((i <= mid) && (j <= high)) {
+		if (ap->array[i] < ap->array[j])
+			tmpArray[k++] = ap->array[i++];
+		else
+			tmpArray[k++] = ap->array[j++];
+	}
+	while (i <= mid) {
+		tmpArray[k++] = ap->array[i++];
+	}
+	while (j <= high) {
+		tmpArray[k++] = ap->array[j++];
+	}
+	for (k = 0; k < sz; k++) {
+		ap->array[low + k] = tmpArray[k];
+	}
+	delete [] tmpArray;
+}
+
+void mergeSort(Deque_int* ap, int low, int high) {
+	unsigned int spot;
+	if (low < high) {
+		spot = (low + high) / 2;
+		mergeSort(ap, low, spot);
+		mergeSort(ap, spot + 1, high);
+		mergeSortMerger(ap, low, high, spot);
+	}
+}
+
+void sort_func(Deque_int* ap, Deque_int_Iterator low, Deque_int_Iterator high) {
+	if(high.iterBack < low.iterFront) {
+		std::cout << "YIKES ALERT!" << std::endl;
+		//fix array fix_array(Deque_int* ap);
+	} else if (low.iterFront == high.iterBack) {
+		return; // do nothing!
+	}
+	//int tempFront = low.iterFront;
+	//int tempBack = high.iterBack;
+	mergeSort(ap, low.iterFront, high.iterBack);
+	//ap->frontVar = tempFront;
+	//ap->backVar = tempBack;
+}
+
 
 bool Deque_int_equal(const struct Deque_int ap, const struct Deque_int ap2) {
 	if(ap.sizeVar == ap2.sizeVar) {
@@ -380,6 +429,7 @@ void Deque_int_ctor(Deque_int *ap, bool notSure) {
 	ap->at = &at_func;
 	ap->dtor = dtor_func;
 	ap->clear = &clear_func;
+	ap->sort = &sort_func;
 }
 
 
