@@ -90,7 +90,7 @@ bool Deque_int_equal(const struct Deque_int ap, const struct Deque_int ap2) {
 	if(ap.sizeVar == ap2.sizeVar) {
 		for(long unsigned int i = 0; i < ap.sizeVar; i++) {
 			//std::cout << "COMPARE: " << ap.at(&ap, i) << " vs " << ap2.at(&ap2, i) << std::endl;
-			if(ap.at(&ap, i) != ap2.at(&ap2, i)) {
+			if(ap.compare(ap.at(&ap, i), ap2.at(&ap2, i)) || ap.compare(ap2.at(&ap2, i), ap.at(&ap, i))) {
 				return false;
 			}
 		}
