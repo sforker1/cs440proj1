@@ -106,7 +106,7 @@ void clear_func(Deque_int* ap) {
 }
 
 void dtor_func(Deque_int* ap) {
-	// save for later
+	free(ap->array);
 }
 
 int at_func(const struct Deque_int* ap, int num) {

@@ -90,6 +90,7 @@
 		ap->backVar = -1; \
 	} \
 	void dtor_func(Deque_##t *ap) { \
+		free(ap->array); \
 	} \
 	t& at_func(const struct Deque_##t *ap, int num) { \
 		int index = ap->frontVar + num; \
