@@ -75,16 +75,45 @@ void mergeSort(Deque_int* ap, int lower, int higher) {
 	}
 }
 
+void fix_for_sort(Deque_int* ap) {
+	int tempArrSize = (ap->arrSize - ap->frontVar);
+	int *tempArr = new int[tempArrSize];
+	int index = 0;
+	for(int i = ap->frontVar; i < ap->arrSize; i++) {
+		tempArr[index] = ap->array[i];
+		index++;
+	}
+
+	int endOfArr = 0;
+	int newBackVar = ap->backVar + (ap->arrSize - ap->frontVar);
+
+	while (ap->backVar != newBackVar) {
+		for(int i = ap->backVar; i >= endOfArr; i--) {
+			ap->array[i + 1] = ap->array[i];
+		}
+		ap->backVar++;
+		endOfArr++;
+	}
+	ap->frontVar = 0;
+
+	for(int i = 0; i < tempArrSize; i++) {
+		ap->array[i] = tempArr[i];
+	}
+
+	delete [] tempArr;
+}
+
 void sort_func(Deque_int* ap, Deque_int_Iterator low, Deque_int_Iterator high) {
 	if(high.iterCurr < low.iterCurr) {
-		std::cout << "YIKES ALERT!" << std::endl;
-		//fix array fix_array(Deque_int* ap);
+		int shiftAmt = (ap->arrSize - ap->frontVar);
+		low.iterCurr = (low.iterCurr - ap->frontVar);
+		high.iterCurr = (shiftAmt + high.iterCurr);
+		fix_for_sort(ap);
 	} else if (low.iterCurr == high.iterCurr) {
 		return; // do nothing!
 	}
 	mergeSort(ap, low.iterCurr, high.iterCurr);
 }
-
 
 bool Deque_int_equal(const struct Deque_int ap, const struct Deque_int ap2) {
 	if(ap.sizeVar == ap2.sizeVar) {

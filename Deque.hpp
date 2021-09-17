@@ -66,8 +66,35 @@
 			mergeSortMerger(ap, lower, higher, middle); \
 		} \
 	} \
+    void fix_for_sort(Deque_##t *ap) { \
+		int tempArrSize = (ap->arrSize - ap->frontVar); \
+		t *tempArr = new t[tempArrSize]; \
+		int index = 0; \
+		for(int i = ap->frontVar; i < ap->arrSize; i++) { \
+			tempArr[index] = ap->array[i]; \
+			index++; \
+		} \
+		int endOfArr = 0; \
+		int newBackVar = ap->backVar + (ap->arrSize - ap->frontVar); \
+		while (ap->backVar != newBackVar) { \
+			for(int i = ap->backVar; i >= endOfArr; i--) { \
+				ap->array[i + 1] = ap->array[i]; \
+			} \
+			ap->backVar++; \
+			endOfArr++; \
+		} \
+		ap->frontVar = 0; \
+		for(int i = 0; i < tempArrSize; i++) { \
+			ap->array[i] = tempArr[i]; \
+		} \
+		delete [] tempArr; \
+	} \
 	void sort_func(Deque_##t *ap, Deque_##t##_Iterator low, Deque_##t##_Iterator high) { \
 		if(high.iterCurr < low.iterCurr) { \
+            int shiftAmt = (ap->arrSize - ap->frontVar); \
+			low.iterCurr = (low.iterCurr - ap->frontVar); \
+			high.iterCurr = (shiftAmt + high.iterCurr); \
+			fix_for_sort(ap); \
 		} else if (low.iterCurr == high.iterCurr) { \
 			return; \
 		} \

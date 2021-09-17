@@ -120,6 +120,51 @@ int
 main() {
 	FILE *devnull = fopen("/dev/null", "w");
 	assert(devnull != 0);
+
+
+	{
+		Deque_int deq;
+		Deque_int_ctor(&deq, int_less);
+
+		Deque_int deq1;
+		Deque_int_ctor(&deq1, int_less);
+
+		deq.push_back(&deq, 10);
+		deq.push_back(&deq, 9);
+		deq.push_back(&deq, 8);
+		deq.push_back(&deq, 7);
+		deq.push_back(&deq, 6);
+		deq.push_front(&deq, 3);
+		deq.push_front(&deq, 4);
+
+		deq1.push_back(&deq1, 4);
+		deq1.push_back(&deq1, 3);
+		deq1.push_back(&deq1, 8);
+		deq1.push_back(&deq1, 9);
+		deq1.push_back(&deq1, 10);
+		deq1.push_back(&deq1, 7);
+		deq1.push_back(&deq1, 6);
+
+		auto iter1 = deq.begin(&deq);
+		auto iter2 = deq.end(&deq);
+
+		for(int i=0;i<1;i++)
+			iter1.inc(&iter1);
+
+		for(int i=0;i<2;i++)
+			iter2.dec(&iter2);
+
+		deq.sort(&deq, iter1, iter2);
+
+		assert(Deque_int_equal(deq, deq1));
+
+		deq.clear(&deq);
+		deq1.clear(&deq1);
+
+		deq.dtor(&deq);
+		deq1.dtor(&deq1);
+	}
+
 	{
 		Deque_MyClass deq;
 		Deque_MyClass_ctor(&deq, MyClass_less_by_id);
