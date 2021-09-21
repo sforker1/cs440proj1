@@ -121,6 +121,78 @@ main() {
 	FILE *devnull = fopen("/dev/null", "w");
 	assert(devnull != 0);
 
+	{
+		Deque_int deq;
+		Deque_int_ctor(&deq, int_less);
+
+		Deque_int deq1;
+		Deque_int_ctor(&deq1, int_less);
+
+		deq.push_back(&deq, 1);
+		deq.push_back(&deq, 2);
+		deq.push_back(&deq, 3);
+		deq.push_back(&deq, 4);
+		deq.pop_back(&deq);
+		deq.pop_back(&deq);
+		deq.pop_back(&deq);
+		deq.pop_back(&deq);
+		deq.pop_back(&deq);
+
+		for (Deque_int_Iterator it = deq.begin(&deq);
+		     !Deque_int_Iterator_equal(it, deq.end(&deq)); it.inc(&it)) {
+			printf("%d\n", it.deref(&it));
+		}
+
+		deq.push_front(&deq, 1);
+		deq.push_front(&deq, 2);
+		deq.push_front(&deq, 3);
+		deq.push_front(&deq, 4);
+		deq.pop_front(&deq);
+		deq.pop_front(&deq);
+		deq.pop_front(&deq);
+		deq.pop_front(&deq);
+		deq.pop_front(&deq);
+
+		for (Deque_int_Iterator it = deq.begin(&deq);
+		     !Deque_int_Iterator_equal(it, deq.end(&deq)); it.inc(&it)) {
+			printf("%d\n", it.deref(&it));
+		}
+
+		deq.push_back(&deq, 1);
+		deq.push_back(&deq, 2);
+		deq.push_front(&deq, 3);
+		deq.push_front(&deq, 4);
+
+		printf("here\n");
+		for (Deque_int_Iterator it = deq.begin(&deq);
+		     !Deque_int_Iterator_equal(it, deq.end(&deq)); it.inc(&it)) {
+			printf("%d\n", it.deref(&it));
+		}
+
+		deq1.push_back(&deq1, 1);
+		deq1.push_back(&deq1, 2);
+		deq1.push_front(&deq1, 3);
+		deq1.push_front(&deq1, 4);
+
+		for (Deque_int_Iterator it = deq.begin(&deq);
+		     !Deque_int_Iterator_equal(it, deq.end(&deq)); it.inc(&it)) {
+			printf("%d\n", it.deref(&it));
+		}
+		printf("--------------------\n");
+
+		for (Deque_int_Iterator it = deq1.begin(&deq1);
+		     !Deque_int_Iterator_equal(it, deq1.end(&deq1)); it.inc(&it)) {
+			printf("%d\n", it.deref(&it));
+		}
+
+		assert(Deque_int_equal(deq, deq1));
+
+		deq.clear(&deq);
+		deq1.clear(&deq1);
+
+		deq.dtor(&deq);
+		deq1.dtor(&deq1);
+	}
 
 	{
 		Deque_int deq;
@@ -364,7 +436,6 @@ main() {
 		deq1.dtor(&deq1);
 		deq2.dtor(&deq2);
 	}
-
 	// Test performance.
 	{
 		std::default_random_engine e;
@@ -376,7 +447,6 @@ main() {
 		for (int i = 0; i < 10000; i++) {
 			deq.push_back(&deq, i);
 		}
-
 		// In one end, out the other.
 		for (int i = 0; i < 20000000; i++) {
 			// fprintf(stderr, "iter: %d\n", i);
@@ -387,7 +457,6 @@ main() {
 			deq.push_front(&deq, i);
 			deq.pop_back(&deq);
 		}
-
 		// To do some computation, to prevent compiler from optimizing out.
 		size_t sum = 0, max_size = 0;
 		// Random.
@@ -424,7 +493,6 @@ main() {
 		printf("%d push_backs, %d push_fronts, %d pop_backs, %d pop_fronts, %d size\n", pb, pf, pob, pof, (int) deq.size(&deq));
 		deq.dtor(&deq);
 	}
-
 	// Test random access performance
 	{
 		size_t sum = 0;

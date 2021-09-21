@@ -3,7 +3,7 @@ FLAGS = -Wall -Wextra -pedantic -ldl
 LASTNAME = Forker
 BU_USERID = sforker1
 GITHUB_USERID = sforker1
-EXECUTABLE = test
+EXECUTABLE = program1
 
 test: clean test.o
 	g++ $(FLAGS) test.o -o $(EXECUTABLE)

@@ -179,50 +179,38 @@
 		return retVal; \
 	} \
 	void pop_front_func(Deque_##t *ap) { \
-		if(ap->frontVar == (ap->arrSize - 1)) { \
-			ap->frontVar = 0; \
-			ap->sizeVar--; \
-		} else if (ap->frontVar == 0 && ap->backVar == 0){ \
-			ap->frontVar = -1; \
-			ap->backVar = -1; \
-			ap->sizeVar--; \
-		} else if (ap->frontVar == ap->backVar) { \
-			ap->sizeVar--; \
-		} else if (ap->frontVar < ap->backVar){ \
-			if(ap->frontVar == 0) { \
+        if(ap->backVar == ap->frontVar) { \
+            ap->sizeVar = 0; \
+            ap->frontVar = -1; \
+            ap->backVar = -1; \
+        } else if(ap->frontVar > ap->backVar) { \
+            if(ap->frontVar == (ap->arrSize - 1)) { \
+                ap->frontVar = 0; \
 				ap->sizeVar--; \
-				ap->frontVar = (ap->arrSize - 1); \
 			} else { \
+                ap->frontVar++; \
 				ap->sizeVar--; \
-				ap->frontVar--; \
 			} \
 		} else { \
-			if(ap->frontVar == (ap->arrSize - 1)){ \
-				ap->sizeVar--; \
-				ap->frontVar = 0; \
-			} else { \
-				ap->sizeVar--; \
-				ap->frontVar++; \
-			} \
+            ap->frontVar++; \
+			ap->sizeVar--; \
 		} \
 	} \
 	void pop_back_func(Deque_##t *ap) { \
-		if(ap->backVar == 0 && ap->frontVar == 0){ \
-			ap->backVar = -1; \
+        if(ap->backVar == ap->frontVar) { \
+            ap->sizeVar = 0; \
 			ap->frontVar = -1; \
-			ap->sizeVar--; \
-		} else if (ap->backVar == ap->frontVar) { \
-			ap->sizeVar--; \
-		} else if (ap->backVar < ap->frontVar) { \
-			if(ap->backVar == 0) { \
-				ap->sizeVar--; \
+			ap->backVar = -1; \
+		} else if(ap->backVar < ap->frontVar) { \
+            if(ap->backVar == 0) { \
+                ap->sizeVar--; \
 				ap->backVar = (ap->arrSize - 1); \
 			} else { \
-				ap->sizeVar--; \
+                ap->sizeVar--; \
 				ap->backVar--; \
 			} \
 		} else { \
-			ap->sizeVar--; \
+            ap->sizeVar--; \
 			ap->backVar--; \
 		} \
 	} \
@@ -258,15 +246,6 @@
 			} \
 		} \
 	} \
-	int check_array_space(Deque_##t *ap) { \
-		if(ap->frontVar == 0 && ap->backVar == (ap->arrSize - 1)) { \
-			return 2; \
-		} else if (ap->frontVar == (ap->backVar + 1)) { \
-			return 1; \
-		} else { \
-			return 0; \
-		} \
-	} \
 	void push_front_func(Deque_##t *ap, t newInt){ \
 		if(ap->frontVar == -1) { \
 			ap->frontVar = 0; \
@@ -275,33 +254,26 @@
 			ap->array[ap->frontVar] = newInt; \
 			return; \
 		} \
-		int ifSpace = check_array_space(ap); \
-		if(ifSpace == 0) { \
-			if(ap->frontVar == 0) { \
-				ap->frontVar = ap->arrSize - 1; \
-			} else { \
-				ap->frontVar--; \
-			} \
+        if(ap->frontVar == 0 && ap->backVar == (ap->arrSize - 1)) { \
+            resize_array(ap, false); \
+			ap->frontVar = (ap->arrSize - 1); \
 			ap->sizeVar++; \
 			ap->array[ap->frontVar] = newInt; \
-		} else if (ifSpace == 1) { \
-			resize_array(ap, true); \
-			if(ap->frontVar == 0) { \
-				ap->frontVar = ap->arrSize - 1; \
-			} else { \
-				ap->frontVar--; \
-			} \
+		} else if((ap->frontVar - 1) == ap->backVar) { \
+            resize_array(ap, true); \
+			ap->frontVar--; \
 			ap->sizeVar++; \
 			ap->array[ap->frontVar] = newInt; \
 		} else { \
-			resize_array(ap, false); \
-			if(ap->frontVar == 0) { \
-				ap->frontVar = ap->arrSize - 1; \
+            if(ap->frontVar == 0) { \
+                ap->frontVar = (ap->arrSize - 1); \
+				ap->sizeVar++; \
+				ap->array[ap->frontVar] = newInt; \
 			} else { \
-				ap->frontVar--; \
+                ap->frontVar--; \
+				ap->sizeVar++; \
+				ap->array[ap->frontVar] = newInt; \
 			} \
-			ap->sizeVar++; \
-			ap->array[ap->frontVar] = newInt; \
 		} \
 	} \
 	void push_back_func(Deque_##t *ap, t newInt){ \
@@ -312,21 +284,26 @@
 			ap->array[ap->backVar] = newInt; \
 			return; \
 		} \
-		int ifSpace = check_array_space(ap); \
-		if(ifSpace == 0) { \
-			ap->backVar++; \
+        if(ap->frontVar == 0 && ap->backVar == (ap->arrSize - 1)) { \
+            resize_array(ap, false); \
+            ap->backVar++; \
 			ap->sizeVar++; \
 			ap->array[ap->backVar] = newInt; \
-		} else if (ifSpace == 1) { \
-			resize_array(ap, true); \
-			ap->backVar++; \
+		} else if((ap->backVar + 1) == ap->frontVar) { \
+            resize_array(ap, true); \
+            ap->backVar++; \
 			ap->sizeVar++; \
 			ap->array[ap->backVar] = newInt; \
 		} else { \
-			resize_array(ap, false); \
-			ap->backVar++; \
-			ap->sizeVar++; \
-			ap->array[ap->backVar] = newInt; \
+            if(ap->backVar == (ap->arrSize - 1)) { \
+                ap->backVar = 0; \
+				ap->sizeVar++; \
+				ap->array[ap->backVar] = newInt; \
+			} else { \
+                ap->backVar++; \
+				ap->sizeVar++; \
+				ap->array[ap->backVar] = newInt; \
+			} \
 		} \
 	} \
 	void Deque_##t##_ctor(Deque_##t *ap, bool (*compare_func)(const t&, const t&)) { \
