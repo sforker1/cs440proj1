@@ -1,1 +1,2 @@
-# cs440proj1
+# CS440 Project 1
+
